@@ -142,8 +142,8 @@ function createPdf(str, indian) {
 
   function drawMargin() {
     doc
-      .setDrawColor(255, 0, 0)
-      .setLineWidth(1 / 72)
+      .setDrawColor(0, 1, 1)
+      .setLineWidth(1 / 144)
       .line(leftMargin, topMargin, leftMargin, 11 - topMargin)
       .line(8.5 - leftMargin, topMargin, 8.5 - leftMargin, 11 - topMargin);
   }
@@ -153,7 +153,7 @@ function createPdf(str, indian) {
     lines.forEach(line => {
       if (yPosition > maxPageHeight) {
         doc.addPage();
-        drawMargin(doc, leftMargin, topMargin);
+        // drawMargin(doc, leftMargin, topMargin);
         yPosition = topMargin;
       }
       doc.text(line, lmargin, yPosition);
@@ -164,7 +164,7 @@ function createPdf(str, indian) {
   function writeEmptyline() {
     if (yPosition > maxPageHeight) {
       doc.addPage();
-      drawMargin(doc, leftMargin, topMargin);
+      // drawMargin(doc, leftMargin, topMargin);
       yPosition = topMargin;
     }
     yPosition += lineSpacing;
@@ -175,7 +175,7 @@ function createPdf(str, indian) {
     lines.forEach(line => {
       if (yPosition > maxPageHeight) {
         doc.addPage();
-        drawMargin(doc, leftMargin, topMargin);
+        // drawMargin(doc, leftMargin, topMargin);
         yPosition = topMargin;
       }
       doc.text(line, 4.25, yPosition, null, null, "center");
@@ -249,7 +249,7 @@ function createPdf(str, indian) {
   // The height of a single line of text is simply the font size. A line of text at size 10 will take up 10 pt.
   const lineSpacing = (fontSize * 1.15) / 72;
 
-  drawMargin();
+  // drawMargin();
 
   function writeToken(token) {
     switch (token.type) {
