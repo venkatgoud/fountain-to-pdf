@@ -20,5 +20,11 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### TODO
+Unicode font support
+
+Handling of Fountain emphasis syntaxs
+
+Scene number generation
+
+It's hack at the moment but works.
