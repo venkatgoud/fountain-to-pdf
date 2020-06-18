@@ -278,7 +278,9 @@ function createPdf(str, indian) {
       case "transition":
         writeTransition(token.text);
         break;
-
+      case 'centered':
+        center(token.text)
+        break;
       default:
         break;
     }
