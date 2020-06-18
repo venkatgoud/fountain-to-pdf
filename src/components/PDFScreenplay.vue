@@ -10,7 +10,25 @@ import { parse } from "fountain-parser";
 
 /*eslint no-unused-vars: "off"*/
 
+const defaultFont = "Courier";
+// const teluguFont = "Suranna";
+const teluguFont = "BalooTammudu2-Regular";
+  
+const isTelugu = str => /[\u{0c00}-\u{0C7F}]+/u.test(str);
+
+const getFont = str => (isTelugu(str) ? teluguFont : defaultFont);
+
 function createIndianPdf(str) {
+  function setFont(str) {
+    if (isTelugu(str)) {
+      doc.setFont(getFont(str));
+    }
+  }
+
+  function revertFont() {
+    doc.setFont(defaultFont);
+  }
+
   function drawCetnerLine() {
     doc
       .setDrawColor(128, 0, 0)
@@ -25,7 +43,9 @@ function createIndianPdf(str) {
         drawCetnerLine();
         yPosition = topMargin;
       }
+      setFont(line);
       doc.text(line, lmargin, yPosition);
+      revertFont();
       yPosition += lineSpacing;
     });
   }
@@ -164,7 +184,7 @@ function createIndianPdf(str) {
   const rightMargin = 1;
   const topMargin = 1;
 
-  doc.setFont("Courier");
+  doc.setFont(defaultFont);
   doc.setFontSize(fontSize);
 
   const pageHeight = doc.internal.pageSize.height;
@@ -189,6 +209,16 @@ function createPdf(str, indian) {
     return createIndianPdf(str);
   }
 
+  function setFont(str) {
+    if (isTelugu(str)) {
+      doc.setFont(getFont(str),"normal");
+    }
+  }
+
+  function revertFont() {
+    doc.setFont(defaultFont);
+  }
+
   function drawMargin() {
     doc
       .setDrawColor(0, 1, 1)
@@ -205,7 +235,9 @@ function createPdf(str, indian) {
         // drawMargin(doc, leftMargin, topMargin);
         yPosition = topMargin;
       }
+      setFont(line);
       doc.text(line, lmargin, yPosition);
+      revertFont();
       yPosition += lineSpacing;
     });
   }
@@ -227,7 +259,9 @@ function createPdf(str, indian) {
         // drawMargin(doc, leftMargin, topMargin);
         yPosition = topMargin;
       }
+      setFont();
       doc.text(line, 4.25, yPosition, null, null, "center");
+      revertFont();
       yPosition += lineSpacing;
     });
   }
@@ -250,8 +284,7 @@ function createPdf(str, indian) {
     writeText(str, 2, 3.6);
   }
 
-  function writeDialog(str) {
-    // console.log(str);
+  function writeDialog(str) {     
     writeText(str, 3.3, 2.9);
   }
 
@@ -286,10 +319,8 @@ function createPdf(str, indian) {
       case "parenthetical":
         writeParenthetical(token.text);
         break;
-      case "dialogue":
-        // doc.setFont("BalooTammudu2-Regular");
-        writeDialog(token.text);
-        // doc.setFont("Courier");
+      case "dialogue":         
+        writeDialog(token.text);         
         break;
       case "dialogue_end":
         writeEmptyline();
@@ -358,16 +389,14 @@ function createPdf(str, indian) {
   const rightMargin = 1;
   const topMargin = 1;
 
-  doc.setFont("Courier");
+  doc.setFont(defaultFont);   
   doc.setFontSize(fontSize);
 
   const pageHeight = doc.internal.pageSize.height;
   const maxPageHeight = pageHeight - topMargin;
   const maxPageWidth = 8.5 - leftMargin - rightMargin;
   let yPosition = topMargin;
-
-  console.log(doc.getFontList());
-
+   
   // The height of a single line of text is simply the font size. A line of text at size 10 will take up 10 pt.
   const lineSpacing = (fontSize * 1.15) / 72;
   let authorDetails = [];
