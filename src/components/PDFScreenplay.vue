@@ -39,6 +39,19 @@ function createIndianPdf(str) {
     yPosition += lineSpacing;
   }
 
+  function center(str, width = maxPageWidth) {
+    const lines = doc.splitTextToSize(str, width);
+    lines.forEach(line => {
+      if (yPosition > maxPageHeight) {
+        doc.addPage();
+        // drawMargin(doc, leftMargin, topMargin);
+        yPosition = topMargin;
+      }
+      doc.text(line, 4.25, yPosition, null, null, "center");
+      yPosition += lineSpacing;
+    });
+  }
+
   function writeSceneHeading(str) {
     doc.setFontStyle("bold");
     writeText(str + "\n", 6, 1.5);
@@ -64,6 +77,17 @@ function createIndianPdf(str) {
 
   function writeTransition(str) {
     writeText(str + "\n", 1.5, 6);
+  }
+
+  function insertTitlePage() {
+    doc.insertPage(1);
+    center(scriptTitle);
+    writeEmptyline();
+    authorDetails.forEach(str => center(str));
+    for (let index = 0; index < 6; index++) {
+      writeEmptyline();
+    }
+    contactDetails.forEach(str => writeText(str));
   }
 
   function writeToken(token) {
@@ -93,7 +117,25 @@ function createIndianPdf(str) {
       case "transition":
         writeTransition(token.text);
         break;
-
+      case "centered":
+        center(token.text);
+        break;
+      case "title":
+        scriptTitle = token.text;
+        break;
+      case "credit":
+      case "author":
+      case "authors":
+      case "source":
+      case "notes":
+        authorDetails.push(token.text);
+        break;
+      case "draft_date":
+      case "date":
+      case "contact":
+      case "copyright":
+        contactDetails.push(token.text);
+        break;
       default:
         break;
     }
@@ -105,6 +147,9 @@ function createIndianPdf(str) {
       const token = tokens[i];
       writeToken(token);
       // console.log(token);
+    }
+    if (scriptTitle) {
+      insertTitlePage();
     }
   }
 
@@ -129,6 +174,10 @@ function createIndianPdf(str) {
 
   // The height of a single line of text is simply the font size. A line of text at size 10 will take up 10 pt.
   const lineSpacing = (fontSize * 1.15) / 72;
+  let authorDetails = [];
+  let contactDetails = [];
+  let scriptTitle;
+
   drawCetnerLine();
   parse(str, fountainCallbacks);
 
@@ -210,6 +259,79 @@ function createPdf(str, indian) {
     writeText(str + "\n", 1.5, 6);
   }
 
+  function insertTitlePage() {
+    doc.insertPage(1);
+    center(scriptTitle);
+    writeEmptyline();
+    authorDetails.forEach(str => center(str));
+    for (let index = 0; index < 6; index++) {
+      writeEmptyline();
+    }
+    contactDetails.forEach(str => writeText(str));
+  }
+
+  function writeToken(token) {
+    switch (token.type) {
+      case "scene_heading":
+        writeSceneHeading(token.text);
+        break;
+      case "action":
+        writeAction(token.text);
+        break;
+      case "dialogue_begin":
+        break;
+      case "character":
+        writeCharacter(token.text);
+        break;
+      case "parenthetical":
+        writeParenthetical(token.text);
+        break;
+      case "dialogue":
+        // doc.setFont("BalooTammudu2-Regular");
+        writeDialog(token.text);
+        // doc.setFont("Courier");
+        break;
+      case "dialogue_end":
+        writeEmptyline();
+        break;
+      case "transition":
+        writeTransition(token.text);
+        break;
+      case "centered":
+        center(token.text);
+        break;
+      case "title":
+        scriptTitle = token.text;
+        break;
+      case "credit":
+      case "author":
+      case "authors":
+      case "source":
+      case "notes":
+        authorDetails.push(token.text);
+        break;
+      case "draft_date":
+      case "date":
+      case "contact":
+      case "copyright":
+        contactDetails.push(token.text);
+        break;
+      default:
+        break;
+    }
+  }
+
+  function fountainCallbacks(output) {
+    const tokens = output.tokens;
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      writeToken(token);
+    }
+    if (scriptTitle) {
+      insertTitlePage();
+    }
+  }
+
   // *italics*
   // **bold**
   // ***bold italics***
@@ -248,52 +370,12 @@ function createPdf(str, indian) {
 
   // The height of a single line of text is simply the font size. A line of text at size 10 will take up 10 pt.
   const lineSpacing = (fontSize * 1.15) / 72;
+  let authorDetails = [];
+  let contactDetails = [];
+  let scriptTitle;
 
   // drawMargin();
 
-  function writeToken(token) {
-    switch (token.type) {
-      case "scene_heading":
-        writeSceneHeading(token.text);
-        break;
-      case "action":
-        writeAction(token.text);
-        break;
-      case "dialogue_begin":
-        break;
-      case "character":
-        writeCharacter(token.text);
-        break;
-      case "parenthetical":
-        writeParenthetical(token.text);
-        break;
-      case "dialogue":
-        // doc.setFont("BalooTammudu2-Regular");
-        writeDialog(token.text);
-        // doc.setFont("Courier");
-        break;
-      case "dialogue_end":
-        writeEmptyline();
-        break;
-      case "transition":
-        writeTransition(token.text);
-        break;
-      case 'centered':
-        center(token.text)
-        break;
-      default:
-        break;
-    }
-  }
-
-  function fountainCallbacks(output) {
-    const tokens = output.tokens;
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
-      writeToken(token);
-      // console.log(token);
-    }
-  }
   parse(str, fountainCallbacks);
 
   return doc;
