@@ -11,7 +11,7 @@
     "bulma": "^0.8.2",
     "core-js": "^3.6.5",
     "fountain-parser": "git+https://github.com/venkatgoud/fountain-parser.git",
-    "jspdf": "^1.5.3",     
+    "jspdf": "^2.3.1",     
     "vue": "^2.6.11"
   },
   "devDependencies": {
